@@ -1,0 +1,6 @@
+torch==2.8.0
+numpy==1.26.4
+scipy==1.15.2
+tqdm==4.67.1
+argparse
+pickle5; python_version < "3.8"
