@@ -13,22 +13,18 @@ def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # 1. 加载模型
     model = RegModel().to(device)
     model.load_state_dict(torch.load(args.ckpt, map_location=device))
     model.eval()
 
-    # 2. 加载数据并提取单个样本
     with open(args.data, 'rb') as f:
         data = pickle.load(f)
 
-    # 兼容 ndarray 或 dict 格式
     if isinstance(data, dict):
         sample = list(data.values())[args.index]
     else:
         sample = data[args.index]
 
-    # 3. 推理
     with torch.no_grad():
         input_tensor = torch.tensor(sample, dtype=torch.float).unsqueeze(0).to(device)
         intensity = model(input_tensor).cpu().item()
