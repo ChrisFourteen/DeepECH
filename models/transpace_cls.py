@@ -83,9 +83,7 @@ class AttenLstmPosSpaceScale(nn.Module):
         self.pos_fc3 = nn.Linear(200, 500)
 
     def forward(self, x):
-        # ts_features1: (batch_size, 49, 1)
         ts_features1 = self.lstm1(x[:, 4:53].unsqueeze(-1))
-        # ts_features2: (batch_size, 49, 1)
         ts_features2 = self.lstm2(x[:, 53:102].unsqueeze(-1))
         first_four = x[:, :4]  # First 4 columns
         pos_feature = self.pos_fc1(first_four)

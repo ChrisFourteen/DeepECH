@@ -6,12 +6,6 @@ This project implements a **two-stage deep learning framework** to predict the o
 
 ECH waves are essential for magnetospheric dynamics, scattering energetic electrons and contributing to diffuse auroras. This model utilizes multi-resolution geomagnetic indices (SYM-H, SME) and spatial coordinates to provide reliable global predictions, especially during geomagnetic storms.
 
-## Key Research Highlights (from the Manuscript)
-
-- **Two-Stage Architecture**: A classification network first determines wave presence (91.2% accuracy), followed by a regression network for amplitude prediction ($R^2 = 0.7094$).
-- **Multi-Resolution Features**: Extracts temporal features from SYM-H and SME sequences at both 1-hour and 1-minute resolutions using an **Attention-LSTM** network.
-- **Spatial Modeling**: Incorporates L-shell, Magnetic Local Time (MLT), and Magnetic Latitude (MLAT) for precise spatial mapping.
-- **Scientific Impact**: Offers instantaneous, global wave distribution maps, overcoming the limitations of traditional statistical models.
 
 ## Model Components
 
@@ -19,6 +13,24 @@ ECH waves are essential for magnetospheric dynamics, scattering energetic electr
 2. **Regression Model (`models/transpace.py`)**: Estimates the wave amplitude (in dB) when waves are present.
 3. **Classification Inference (`run_cls.py`)**: Runs single-sample classification.
 4. **Regression Inference (`run_reg.py`)**: Runs single-sample regression.
+
+## Data Format
+The input feature vector structured as follows:
+### 1. Position Input (Indices 0-3)
+- `[0]`: **L-shell** - Geocentric distance to the magnetic field line's equatorial point (in Earth radii, $R_E$).
+- `[1]`: **cos(MLT)** - Cosine of the Magnetic Local Time.
+- `[2]`: **sin(MLT)** - Sine of the Magnetic Local Time.
+- `[3]`: **cos(MLAT)^6** - Sixth power of the cosine of the Magnetic Latitude.
+
+### 2. Sequence Input (Indices 4-224)
+Based on the manuscript and model architecture, the sequence input consists of multi-resolution geomagnetic indices (SYM-H and SME) used to capture temporal activity across four sequences:
+
+- `[4-52]`: **Sequence 1** (Length 49)
+- `[53-101]`: **Sequence 2** (Length 49)
+- `[102-162]`: **Sequence 3** (Length 61)
+- `[163-223]`: **Sequence 4** (Length 61)
+
+These sequences are processed by the **Attention-based LSTM** modules to extract temporal features representing the geomagnetic disturbance levels.
 
 ## Getting Started
 

@@ -7,8 +7,8 @@ from models.transpace import AttenLstmPosSpaceScale as RegModel
 def main():
     parser = argparse.ArgumentParser(description="ECH Regression Inference (Single Sample)")
     parser.add_argument('--ckpt', type=str, default='checkpoints/regression_model.pth', help='Model checkpoint')
-    parser.add_argument('--data', type=str, default='data/sample_regression.pkl', help='Data file (.pkl)')
-    parser.add_argument('--index', type=int, default=0, help='Sample index to infer')
+    parser.add_argument('--data', type=str, default='data/sample_data.pkl', help='Data file (.pkl)')
+    parser.add_argument('--index', type=int, default=60, help='Sample index to infer')
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -33,32 +33,20 @@ def main():
         input_tensor = torch.tensor(sample, dtype=torch.float).unsqueeze(0).to(device)
         intensity = model(input_tensor).cpu().item()
 
-    # 4. 打印结果
+    # 4. Print Results
     print("-" * 50)
     print(f"ECH Regression Result (Sample Index: {args.index})")
     print("-" * 50)
 
-    # Position Input (前4位)
+    # Position Input
     print("1. Position Input:")
-    print(f"   [0] L-shell: {sample[0]:.2f}")
-    print(f"   [1] cos(MLT): {sample[1]:.2f}")
-    print(f"   [2] sin(MLT): {sample[2]:.2f}")
-    print(f"   [3] cos(MLAT)^6: {sample[3]:.2f}")
+    print(f"   L-shell: {sample[0]:.2f}")
+    print(f"   cos(MLT): {sample[1]:.2f}")
+    print(f"   sin(MLT): {sample[2]:.2f}")
+    print(f"   cos(MLAT)^6: {sample[3]:.2f}")
 
-    # Sequence Input (后续序列)
-    print("\n2. Sequence Input:")
-    # 根据模型定义，通常回归模型也遵循类似的输入结构
-    seq1 = sample[4:53]
-    seq2 = sample[53:102]
-    print(f"   Sequence 1 (Indices 4-52, Length {len(seq1)}):")
-    print(f"      Mean: {np.mean(seq1):.4f}, Std: {np.std(seq1):.4f}")
-    print(f"      First 5 values: {seq1[:5]}")
-    print(f"   Sequence 2 (Indices 53-101, Length {len(seq2)}):")
-    print(f"      Mean: {np.mean(seq2):.4f}, Std: {np.std(seq2):.4f}")
-    print(f"      First 5 values: {seq2[:5]}")
-
-    print("-" * 50)
-    print(f"ECH Wave Intensity: {intensity:.4f}")
+    # The regression network outputs the predicted wave amplitude in dB
+    print(f"Predicted ECH Wave Intensity: {intensity:.4f} dB")
     print("-" * 50)
 
 if __name__ == "__main__":
