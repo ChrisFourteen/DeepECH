@@ -14,7 +14,6 @@ class Attention(nn.Module):
         context_vector = torch.sum(attention_weights * lstm_output, dim=1)  # (batch_size, hidden_dim)
         return context_vector, attention_weights
 
-# TimeSeriesLSTM实现
 class TimeSeriesAttnLSTM(nn.Module):
     def __init__(self, input_dim=1, hidden_dim=64, num_layers=1, dropout=0, bidirectional=False, seq_length=49):
         super(TimeSeriesAttnLSTM, self).__init__()
