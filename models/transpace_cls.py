@@ -1,4 +1,4 @@
-# 用于二分类的网络
+# Network for binary classification
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -33,10 +33,10 @@ class TimeSeriesLSTM(nn.Module):
         self.global_avg_pool = nn.AdaptiveAvgPool1d(1)
 
     def forward(self, x):
-        # LSTM的输出是 (batch_size, seq_length, hidden_dim)
+        # LSTM output: (batch_size, seq_length, hidden_dim)
         lstm_out, _ = self.lstm(x)
-        # 全局平均池化
-        lstm_out = lstm_out.permute(0, 2, 1)  # 调整维度为(batch_size, hidden_dim, seq_length)
+        # Global Average Pooling
+        lstm_out = lstm_out.permute(0, 2, 1)  # (batch_size, hidden_dim, seq_length)
         pooled_output = self.global_avg_pool(lstm_out).squeeze(-1)  # (batch_size, hidden_dim)
         return pooled_output
 
@@ -48,26 +48,26 @@ class TimeSeriesTransformer(nn.Module):
         self.position_encoding = nn.Parameter(torch.zeros(1, seq_length, d_model))
         encoder_layer = nn.TransformerEncoderLayer(d_model, nhead, dim_feedforward, dropout)
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_encoder_layers)
-        self.global_avg_pool = nn.AdaptiveAvgPool1d(1)  # 全局平均池化
+        self.global_avg_pool = nn.AdaptiveAvgPool1d(1)  # Global Average Pooling
 
     def forward(self, src):
-        src = src.unsqueeze(-1)  # 确保输入为(batch_size, seq_length, 1)
+        src = src.unsqueeze(-1)  # (batch_size, seq_length, 1)
         src = self.embedding(src) + self.position_encoding
         output = self.transformer_encoder(src)
-        output = output.permute(0, 2, 1)  # 调整维度以适应池化层 (batch_size, d_model, seq_length)
+        output = output.permute(0, 2, 1)  # (batch_size, d_model, seq_length)
         output = self.global_avg_pool(output).squeeze(-1)  # (batch_size, d_model)
         return output
 
 
 class AttenLstmPosSpaceScale(nn.Module):
     """
-    试验编号 2024071801(添加attention模块)
+    Experiment 2024071801 (Added attention module)
     """
     def __init__(self, dropout_rate=0.1):
         super(AttenLstmPosSpaceScale, self).__init__()
-        self.lstm1 = TimeSeriesAttnLSTM(hidden_dim=64)  # 输出维度64
-        self.lstm2 = TimeSeriesAttnLSTM(hidden_dim=64)  # 输出维度64
-        self.fc1 = nn.Linear(128 + 500, 1024)  # 4个LSTM输出和pos_feature的总维度
+        self.lstm1 = TimeSeriesAttnLSTM(hidden_dim=64)  # Output dim 64
+        self.lstm2 = TimeSeriesAttnLSTM(hidden_dim=64)  # Output dim 64
+        self.fc1 = nn.Linear(128 + 500, 1024)  # Total dim of 4 LSTM outputs and pos_feature
         self.lkrelu = nn.LeakyReLU()
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(dropout_rate)
@@ -83,10 +83,11 @@ class AttenLstmPosSpaceScale(nn.Module):
         self.pos_fc3 = nn.Linear(200, 500)
 
     def forward(self, x):
-        # 假设 x 已经是适当的格式
-        ts_features1 = self.lstm1(x[:, 4:53].unsqueeze(-1))  # (batch_size, 49, 1)
-        ts_features2 = self.lstm2(x[:, 53:102].unsqueeze(-1))  # (batch_size, 49, 1)
-        first_four = x[:, :4]  # 前4列
+        # ts_features1: (batch_size, 49, 1)
+        ts_features1 = self.lstm1(x[:, 4:53].unsqueeze(-1))
+        # ts_features2: (batch_size, 49, 1)
+        ts_features2 = self.lstm2(x[:, 53:102].unsqueeze(-1))
+        first_four = x[:, :4]  # First 4 columns
         pos_feature = self.pos_fc1(first_four)
         pos_feature = self.relu(pos_feature)
         pos_feature = self.pos_fc2(pos_feature)

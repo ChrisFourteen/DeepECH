@@ -15,9 +15,10 @@ ECH waves are essential for magnetospheric dynamics, scattering energetic electr
 
 ## Model Components
 
-1. **Classification Model (`transpace_cls.py`)**: Predicts the probability of ECH wave occurrence.
-2. **Regression Model (`transpace.py`)**: Estimates the wave amplitude (in dB) when waves are present.
-3. **Inference Script (`run_inference.py`)**: Orchestrates the two-stage logic to generate L-MLT distribution grids.
+1. **Classification Model (`models/transpace_cls.py`)**: Predicts the probability of ECH wave occurrence.
+2. **Regression Model (`models/transpace.py`)**: Estimates the wave amplitude (in dB) when waves are present.
+3. **Classification Inference (`run_cls.py`)**: Runs single-sample classification.
+4. **Regression Inference (`run_reg.py`)**: Runs single-sample regression.
 
 ## Getting Started
 
@@ -28,16 +29,22 @@ pip install -r requirements.txt
 ```
 
 ### Running Inference
-Load pre-trained weights and generate sample grids:
+
+#### ECH Classification
 ```bash
-python run_inference.py
+python run_cls.py --index 60
 ```
-Results are saved in the `results/` folder:
-- `regression_grid.mat`: Global ECH wave amplitude distribution.
-- `classification_grid.mat`: ECH wave occurrence probability map.
+
+#### ECH Regression
+```bash
+python run_reg.py --index 60
+```
 
 ## Project Structure
+- `models/`: Model architecture definitions.
 - `checkpoints/`: Pre-trained model weights.
 - `data/`: Sample input feature vectors (Pickle format).
-- `results/`: Output `.mat` files for visualization (e.g., in MATLAB).
+- `run_cls.py`: Script for classification inference.
+- `run_reg.py`: Script for regression inference.
+- `README_zh.md`: Chinese documentation.
 
