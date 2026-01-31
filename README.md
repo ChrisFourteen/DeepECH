@@ -17,20 +17,17 @@ ECH waves are essential for magnetospheric dynamics, scattering energetic electr
 ## Data Format
 The input feature vector structured as follows:
 ### 1. Position Input (Indices 0-3)
-- `[0]`: **L-shell** - Geocentric distance to the magnetic field line's equatorial point (in Earth radii, $R_E$).
-- `[1]`: **cos(15MLT)** - Cosine of the Magnetic Local Time.
-- `[2]`: **sin(15MLT)** - Sine of the Magnetic Local Time.
-- `[3]`: **cos(MLAT)^6** - Sixth power of the cosine of the Magnetic Latitude.
+- `[0]`: **L-shell**
+- `[1]`: **cos(15MLT)**
+- `[2]`: **sin(15MLT)**
+- `[3]`: **cos(MLAT)^6** 
 
 ### 2. Sequence Input (Indices 4-224)
-Based on the manuscript and model architecture, the sequence input consists of multi-resolution geomagnetic indices (SYM-H and SME) used to capture temporal activity across four sequences:
 
 - `[4-52]`: **Sequence 1** (Length 49)
 - `[53-101]`: **Sequence 2** (Length 49)
 - `[102-162]`: **Sequence 3** (Length 61)
 - `[163-223]`: **Sequence 4** (Length 61)
-
-These sequences are processed by the **Attention-based LSTM** modules to extract temporal features representing the geomagnetic disturbance levels.
 
 ## Getting Started
 
@@ -59,5 +56,6 @@ python run_reg.py --index 60
 - `run_cls.py`: Script for classification inference.
 - `run_reg.py`: Script for regression inference.
 - `README_zh.md`: Chinese documentation.
+
 
 
