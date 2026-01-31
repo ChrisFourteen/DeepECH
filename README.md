@@ -18,8 +18,8 @@ ECH waves are essential for magnetospheric dynamics, scattering energetic electr
 The input feature vector structured as follows:
 ### 1. Position Input (Indices 0-3)
 - `[0]`: **L-shell** - Geocentric distance to the magnetic field line's equatorial point (in Earth radii, $R_E$).
-- `[1]`: **cos(MLT)** - Cosine of the Magnetic Local Time.
-- `[2]`: **sin(MLT)** - Sine of the Magnetic Local Time.
+- `[1]`: **cos(15MLT)** - Cosine of the Magnetic Local Time.
+- `[2]`: **sin(15MLT)** - Sine of the Magnetic Local Time.
 - `[3]`: **cos(MLAT)^6** - Sixth power of the cosine of the Magnetic Latitude.
 
 ### 2. Sequence Input (Indices 4-224)
@@ -59,4 +59,5 @@ python run_reg.py --index 60
 - `run_cls.py`: Script for classification inference.
 - `run_reg.py`: Script for regression inference.
 - `README_zh.md`: Chinese documentation.
+
 
