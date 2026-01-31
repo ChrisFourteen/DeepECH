@@ -1,8 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-# 注意力机制实现
 class Attention(nn.Module):
     def __init__(self, hidden_dim):
         super(Attention, self).__init__()
@@ -14,7 +12,6 @@ class Attention(nn.Module):
         context_vector = torch.sum(attention_weights * lstm_output, dim=1)  # (batch_size, hidden_dim)
         return context_vector, attention_weights
 
-# TimeSeriesLSTM实现
 class TimeSeriesAttnLSTM(nn.Module):
     def __init__(self, input_dim=1, hidden_dim=64, num_layers=1, dropout=0, bidirectional=False, seq_length=49):
         super(TimeSeriesAttnLSTM, self).__init__()
@@ -26,15 +23,14 @@ class TimeSeriesAttnLSTM(nn.Module):
         context_vector, _ = self.attention(lstm_out)  # (batch_size, hidden_dim)
         return context_vector
     
-# 主模型
 class AttenLstmPosSpaceScale(nn.Module):
     def __init__(self, dropout_rate=0.1):
         super(AttenLstmPosSpaceScale, self).__init__()
-        self.lstm1 = TimeSeriesAttnLSTM(hidden_dim=64)  # 输出维度64
-        self.lstm2 = TimeSeriesAttnLSTM(hidden_dim=64)  # 输出维度64
-        self.lstm3 = TimeSeriesAttnLSTM(hidden_dim=64, seq_length=61)  # 输出维度64
-        self.lstm4 = TimeSeriesAttnLSTM(hidden_dim=64, seq_length=61)  # 输出维度64
-        self.fc1 = nn.Linear(256 + 500, 1024)  # 4个LSTM输出和pos_feature的总维度
+        self.lstm1 = TimeSeriesAttnLSTM(hidden_dim=64)  
+        self.lstm2 = TimeSeriesAttnLSTM(hidden_dim=64) 
+        self.lstm3 = TimeSeriesAttnLSTM(hidden_dim=64, seq_length=61) 
+        self.lstm4 = TimeSeriesAttnLSTM(hidden_dim=64, seq_length=61)
+        self.fc1 = nn.Linear(256 + 500, 1024) 
         self.lkrelu = nn.LeakyReLU()
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(dropout_rate)
@@ -50,12 +46,11 @@ class AttenLstmPosSpaceScale(nn.Module):
         self.pos_fc3 = nn.Linear(200, 500)
 
     def forward(self, x):
-        # 假设 x 已经是适当的格式
         ts_features1 = self.lstm1(x[:, 4:53].unsqueeze(-1))  # (batch_size, 49, 1)
         ts_features2 = self.lstm2(x[:, 53:102].unsqueeze(-1))  # (batch_size, 49, 1)
         ts_features3 = self.lstm3(x[:, 102:163].unsqueeze(-1))  # (batch_size, 61, 1)
         ts_features4 = self.lstm4(x[:, 163:].unsqueeze(-1))  # (batch_size, 61, 1)
-        first_four = x[:, :4]  # 前4列
+        first_four = x[:, :4] 
         pos_feature = self.pos_fc1(first_four)
         pos_feature = self.relu(pos_feature)
         pos_feature = self.pos_fc2(pos_feature)
