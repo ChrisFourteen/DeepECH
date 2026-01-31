@@ -13,16 +13,13 @@ def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # 1. 加载模型
     model = ClsModel().to(device)
     model.load_state_dict(torch.load(args.ckpt, map_location=device))
     model.eval()
 
-    # 2. 加载数据并提取单个样本
     with open(args.data, 'rb') as f:
         data = pickle.load(f)
     
-    # 兼容 ndarray 或 dict 格式
     if isinstance(data, dict):
         sample = list(data.values())[args.index]
     else:
@@ -45,24 +42,14 @@ def main():
     print("-" * 50)
     
     # Position Input
-    print("1. Position Input:")
     print(f"   L-shell: {sample[0]:.2f}")
     print(f"   cos(MLT): {sample[1]:.2f}")
     print(f"   sin(MLT): {sample[2]:.2f}")
     print(f"   cos(MLAT)^6: {sample[3]:.2f}")
     
-    # Sequence Input (Summary)
-    print("\n2. Sequence Input (Summary):")
-    # Sequence 1-4 are used as temporal context (SYM-H and SME indices)
-    print(f"   Sequence 1 & 2 (Indices 4-101): Hourly & Minute resolution context.")
-    if len(sample) > 102:
-        print(f"   Sequence 3 & 4 (Indices 102-223): Additional multi-scale context.")
-    
-    print("-" * 50)
     print(f"Raw Model Score (Logit): {output:.4f}")
     print(f"Probability: {probability:.4f}")
     print(f"ECH Wave Presence: {'YES' if has_ech else 'NO'}")
-    print("-" * 50)
 
 if __name__ == "__main__":
     main()
